@@ -1,7 +1,7 @@
 import torch
 import torch.nn.functional as F
 
-import loss as losses
+import space_model.loss as losses
 
 
 class SpaceModelOutput:
