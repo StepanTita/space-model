@@ -1,4 +1,8 @@
 import torch
+import torch.nn.functional as F
+
+import loss as losses
+
 
 class SpaceModelOutput:
     def __init__(self, logits=None, concept_spaces=None):
@@ -54,3 +58,45 @@ class SpaceModelForClassification(torch.nn.Module):
         logits = self.concept_classifier(outputs.logits)  # (B, n_concept_spaces)
 
         return SpaceModelOutput(logits, outputs.concept_spaces)
+
+
+class SpaceModelForSequenceClassificationOutput:
+    def __init__(self, loss=None, logits=None, concept_spaces=None):
+        self.loss = loss
+        self.logits = logits
+        self.concept_spaces = concept_spaces
+
+
+class SpaceModelForSequenceClassification(torch.nn.Module):
+    def __init__(self, base_model, n_embed=3, n_latent=3, n_concept_spaces=2, l1=1e-3, l2=1e-4, fine_tune=True):
+        super().__init__()
+
+        if fine_tune:
+            for p in base_model.parameters():
+                p.requires_grad_(False)
+
+        self.base_model = base_model
+
+        self.space_model = SpaceModel(n_embed, n_latent, n_concept_spaces, output_concept_spaces=True)
+
+        self.classifier = torch.nn.Linear(n_concept_spaces * n_latent, n_concept_spaces)
+
+        self.l1 = l1
+        self.l2 = l2
+
+    def forward(self, input_ids, attention_mask, labels=None):
+        embed = self.base_model(input_ids, attention_mask).last_hidden_state  # (B, max_seq_len, 768)
+
+        out = self.space_model(embed)
+
+        concept_hidden = out.logits
+
+        logits = self.classifier(concept_hidden)
+
+        loss = 0.0
+        if labels is not None:
+            loss = F.cross_entropy(logits, labels)
+        loss += self.l1 * losses.inter_space_loss(out.concept_spaces) + self.l2 * losses.intra_space_loss(
+            out.concept_spaces)
+
+        return SpaceModelForSequenceClassificationOutput(loss, logits, out.concept_spaces)
