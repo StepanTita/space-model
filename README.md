@@ -77,7 +77,7 @@ n_latent = 3
 | Space-model (CE loss) | 4622         | 0.5149 | 0.8110   | 0.8108           | 0.8227    | 0.7899 | 0                  | 0                  |
 | BERT-base-cased       | 1538         | 0.6289 | 0.6588   | 0.6555           | 0.6919    | 0.5649 | N/A                | N/A                |
 
-### Bert Results:
+<!---### Bert Results:
 
 ![loss](https://github.com/StepanTita/space-model/assets/44279105/a1dc0fa1-d115-4313-ae8f-1c6546fe7db1)
 ![accuracy](https://github.com/StepanTita/space-model/assets/44279105/e1185270-fb45-4deb-a97b-5df9517b420b)
@@ -92,6 +92,7 @@ n_latent = 3
 ![f1_macro](https://github.com/StepanTita/space-model/assets/44279105/c4f43845-b74f-4612-b6ea-6096cfdfc807)
 ![recall](https://github.com/StepanTita/space-model/assets/44279105/b183f72c-4090-43b2-baf5-d6ff8554ba2a)
 ![precision](https://github.com/StepanTita/space-model/assets/44279105/15304368-7de2-43ce-8143-7bf171fdb364)
+-->
 
 ## Regularization comparison (15 epochs)
 
