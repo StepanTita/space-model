@@ -45,7 +45,9 @@ n_latent = 3
 | Space-model (CE loss)                             | 4622         | 0.4230 | **0.8265** | **0.8264**       | **0.8313** | **0.8197** | 0                  | 0                  |
 | DistilBERT-base-cased                             | 592130       | 0.4165 | 0.8171     | 0.8170           | 0.8178     | 0.8166     | N/A                | N/A                |
 
-## HateXplain Dataset (zero-shot)
+## HateXplain Dataset
+
+### Zero-shot (2 labels)
 
 | Metric                                            | Loss   | Accuracy   | F1-score (macro) | Precision  | Recall     | Inter-space weight | Intra-space weight |
 |---------------------------------------------------|--------|------------|------------------|------------|------------|--------------------|--------------------|
@@ -54,6 +56,14 @@ n_latent = 3
 | Space-model (CE loss + intra-space)               | 0.6707 | 0.5821     | **0.5187**       | 0.4752     | **0.2698** | 0                  | 0.001              |
 | Space-model (CE loss)                             | 0.6874 | 0.5977     | 0.5040           | 0.5130     | 0.2007     | 0                  | 0                  |
 | DistilBERT-base-cased                             | 0.8529 | **0.6013** | 0.4450           | **0.5619** | 0.0869     | N/A                | N/A                |
+
+### Head Fine-tuning  (3 labels)
+
+| Metric                                            | Train Params | Loss   | Accuracy   | F1-score (macro) | Precision  | Recall     | Inter-space weight | Intra-space weight |
+|---------------------------------------------------|--------------|--------|------------|------------------|------------|------------|--------------------|--------------------|
+| Space-model (CE loss + inter-space + intra-space) | 6942         | 1.5546 | 0.4173     | 0.2225           | 0.3530     | 0.4173     | 0.2                | 0.001              |
+| Space-model (CE loss)                             | 6942         | 0.9969 | **0.5296** | **0.4304**       | **0.5431** | **0.5296** | 0                  | 0                  |
+| bert-base-cased                                   | 2307         | 1.0584 | 0.4485     | 0.3314           | 0.4471     | 0.4485     | N/A                | N/A                |
 
 ### 15 epochs (regularization & generalization study)
 
