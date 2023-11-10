@@ -87,6 +87,15 @@ n_latent = 3
 | Space-model (CE loss) | 4622         | 0.5149 | **0.8110** | **0.8108**       | **0.8227** | **0.7899** | 0                  | 0                  |
 | BERT-base-cased       | 1538         | 0.6289 | 0.6588     | 0.6555           | 0.6919     | 0.5649     | N/A                | N/A                |
 
+# SOTA
+
+## XLNet (fine-tuned)
+
+| Metric                | Loss   | Accuracy   | F1-score (macro) | Precision  | Recall     | Inter-space weight | Intra-space weight |
+|-----------------------|--------|------------|------------------|------------|------------|--------------------|--------------------|
+| Space-model (CE loss) | 0.1479 | **0.9488** | **0.9487**       | **0.9463** | 0.9516     | 0                  | 0                  |
+| XLNet-base-cased      | 0.1923 | 0.9387     | 0.9386           | 0.9106     | **0.9731** | N/A                | N/A                |
+
 <!---### Bert Results:
 
 ![loss](https://github.com/StepanTita/space-model/assets/44279105/a1dc0fa1-d115-4313-ae8f-1c6546fe7db1)
