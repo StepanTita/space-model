@@ -37,7 +37,7 @@ n_latent = 3
 | Space-model (CE loss)                             | 197122       | 0.3855 | **0.8322** | **0.8320**       | 0.8093     | **0.8663** | 0                  | 0                  |
 | DistilBERT-base-cased                             | 592130       | 0.4612 | 0.7852     | 0.7819           | **0.8799** | 0.6614     | N/A                | N/A                |
 
-### 15 epochs (regularization & generalization study)
+* 15 epochs (regularization & generalization study)
 
 | Metric                                            | Train Params | Loss   | Accuracy   | F1-score (macro) | Precision  | Recall     | Inter-space weight | Intra-space weight |
 |---------------------------------------------------|--------------|--------|------------|------------------|------------|------------|--------------------|--------------------|
@@ -65,7 +65,7 @@ n_latent = 3
 | Space-model (CE loss)                             | 6942         | 0.9969 | **0.5296** | **0.4304**       | **0.5431** | **0.5296** | 0                  | 0                  |
 | bert-base-cased                                   | 2307         | 1.0584 | 0.4485     | 0.3314           | 0.4471     | 0.4485     | N/A                | N/A                |
 
-### 15 epochs (regularization & generalization study)
+* 15 epochs (regularization & generalization study)
 
 | Metric                                            | Loss   | Accuracy   | F1-score (macro) | Precision  | Recall     | Inter-space weight | Intra-space weight |
 |---------------------------------------------------|--------|------------|------------------|------------|------------|--------------------|--------------------|
