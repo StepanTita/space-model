@@ -103,7 +103,7 @@ class SpaceModelForSequenceClassification(torch.nn.Module):
         loss = 0.0
         if labels is not None:
             loss = F.cross_entropy(logits, labels)
-        loss += self.l1 * losses.inter_space_loss(out.concept_spaces) + self.l2 * losses.intra_space_loss(
-            out.concept_spaces)
+            loss += self.l1 * losses.inter_space_loss(out.concept_spaces) + self.l2 * losses.intra_space_loss(
+                out.concept_spaces)
 
         return SpaceModelForSequenceClassificationOutput(loss, logits, out.concept_spaces)
