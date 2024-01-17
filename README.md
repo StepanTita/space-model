@@ -1,8 +1,16 @@
-# space-model
+# Space-Model Language Model Framework
 
-## Experiments
+Welcome to the space-model GitHub repository! 🚀
 
-```
+## Overview
+
+The `space-model` is a cutting-edge framework for fine-tuning large pre-trained language models (LLMs) on specific datasets, without compromising generalizability. Our approach leverages task-specific context attribution, allowing for enhanced performance on downstream tasks.
+
+## Framework Description
+
+### Configuration
+
+```python
 epochs = 5
 batch_size = 256
 max_seq_len = 256
@@ -87,14 +95,21 @@ n_latent = 3
 | Space-model (CE loss) | 4622         | 0.5149 | **0.8110** | **0.8108**       | **0.8227** | **0.7899** | 0                  | 0                  |
 | BERT-base-cased       | 1538         | 0.6289 | 0.6588     | 0.6555           | 0.6919     | 0.5649     | N/A                | N/A                |
 
-# SOTA
+## State-of-the-art Results
 
-## XLNet (fine-tuned)
+### XLNet (fine-tuned)
 
 | Metric                | Loss   | Accuracy   | F1-score (macro) | Precision  | Recall     | Inter-space weight | Intra-space weight |
 |-----------------------|--------|------------|------------------|------------|------------|--------------------|--------------------|
 | Space-model (CE loss) | 0.1479 | **0.9488** | **0.9487**       | **0.9463** | 0.9516     | 0                  | 0                  |
 | XLNet-base-cased      | 0.1923 | 0.9387     | 0.9386           | 0.9106     | **0.9731** | N/A                | N/A                |
+
+## Social Media Attributions (fine-tuned) BERT uncased
+
+| Metric            | Loss   | Accuracy   | F1-score (macro) | Precision | Recall     |
+|-------------------|--------|------------|------------------|-----------|------------|
+| Space-model       | 0.4042 | **0.8309** | **0.8006**       | 0.7126    | **0.7337** |
+| BERT-base-uncased | 0.4230 | 0.8220     | 0.7484           | 0.8876    | 0.4674     |
 
 <!---### Bert Results:
 
