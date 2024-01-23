@@ -86,6 +86,11 @@ class SpaceModelForSequenceClassification(torch.nn.Module):
         self.l1 = l1
         self.l2 = l2
 
+    def to(self, device):
+        self.device = device
+        super().to(device)
+        return self
+
     def get_concept_spaces(self, input_ids, attention_mask):
         embed = self.base_model(input_ids, attention_mask).last_hidden_state  # (B, max_seq_len, 768)
 
