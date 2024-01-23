@@ -75,7 +75,7 @@ class SpaceModelForSequenceClassification(torch.nn.Module):
             for p in base_model.parameters():
                 p.requires_grad_(False)
 
-        self.device = self.base_model.device
+        self.device = base_model.device
 
         self.base_model = base_model
 
