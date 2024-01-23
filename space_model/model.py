@@ -75,6 +75,8 @@ class SpaceModelForSequenceClassification(torch.nn.Module):
             for p in base_model.parameters():
                 p.requires_grad_(False)
 
+        self.device = self.base_model.device
+
         self.base_model = base_model
 
         self.space_model = SpaceModel(n_embed, n_latent, n_concept_spaces, output_concept_spaces=True)
