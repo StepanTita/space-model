@@ -68,7 +68,7 @@ class SpaceModelForSequenceClassificationOutput:
 
 
 class SpaceModelForSequenceClassification(torch.nn.Module):
-    def __init__(self, base_model, n_embed=3, n_latent=3, n_concept_spaces=2, l1=1e-3, l2=1e-4, fine_tune=True):
+    def __init__(self, base_model, n_embed=3, n_latent=3, n_concept_spaces=2, l1=1e-3, l2=1e-4, ce_w=1.0, fine_tune=True):
         super().__init__()
 
         if fine_tune:
@@ -85,6 +85,7 @@ class SpaceModelForSequenceClassification(torch.nn.Module):
 
         self.l1 = l1
         self.l2 = l2
+        self.ce_w = ce_w
 
     def to(self, device):
         self.device = device
@@ -101,7 +102,7 @@ class SpaceModelForSequenceClassification(torch.nn.Module):
     def forward(self, input_ids, attention_mask, labels=None):
         embed = self.base_model(input_ids, attention_mask).last_hidden_state  # (B, max_seq_len, 768)
 
-        out = self.space_model(embed)
+        out = self.space_model(embed) # SpaceModelOutput(logits=(B, n_concept_spaces * n_latent), ...)
 
         concept_hidden = out.logits
 
@@ -109,7 +110,7 @@ class SpaceModelForSequenceClassification(torch.nn.Module):
 
         loss = 0.0
         if labels is not None:
-            loss = F.cross_entropy(logits, labels)
+            loss = self.ce_w * F.cross_entropy(logits, labels)
             loss += self.l1 * losses.inter_space_loss(out.concept_spaces, labels) + self.l2 * losses.intra_space_loss(
                 out.concept_spaces)
 
