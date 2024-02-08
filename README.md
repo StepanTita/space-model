@@ -2,6 +2,14 @@
 
 Welcome to the space-model GitHub repository! 🚀
 
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/breaking-free-transformer-models-task/zero-shot-text-classification-on-hatexplain)](https://paperswithcode.com/sota/zero-shot-text-classification-on-hatexplain?p=breaking-free-transformer-models-task)
+
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/breaking-free-transformer-models-task/text-classification-on-hatexplain-1)](https://paperswithcode.com/sota/text-classification-on-hatexplain-1?p=breaking-free-transformer-models-task)
+
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/breaking-free-transformer-models-task/text-classification-on-imdb-movie-reviews-1)](https://paperswithcode.com/sota/text-classification-on-imdb-movie-reviews-1?p=breaking-free-transformer-models-task)
+
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/breaking-free-transformer-models-task/text-classification-on-social-media)](https://paperswithcode.com/sota/text-classification-on-social-media?p=breaking-free-transformer-models-task)
+
 ## Overview
 
 The `space-model` is a cutting-edge framework for fine-tuning large pre-trained language models (LLMs) on specific datasets, without compromising generalizability. Our approach leverages task-specific context attribution, allowing for enhanced performance on downstream tasks.
@@ -128,20 +136,47 @@ n_latent = 3
 ![precision](https://github.com/StepanTita/space-model/assets/44279105/15304368-7de2-43ce-8143-7bf171fdb364)
 -->
 
-## Regularization comparison (15 epochs)
+## Regularization comparison
 
-### DistilBERT
+### BERT with Inter-space and Intra-Space Losses
 
-![loss](assets/distilbert/regularization/distilbert/loss.png)
-![accuracy](assets/distilbert/regularization/distilbert/accuracy.png)
-![f1_macro](assets/distilbert/regularization/distilbert/f1.png)
-![recall](assets/distilbert/regularization/distilbert/recall.png)
-![precision](assets/distilbert/regularization/distilbert/precision.png)
+![loss](assets/bert-loss/loss.png)
+![accuracy](assets/bert-loss/acc.png)
+![accuracy](assets/bert-loss/cs_acc.png)
+![f1_macro](assets/bert-loss/f1.png)
+![f1_macro](assets/bert-loss/cs_f1.png)
+![recall](assets/bert-loss/recall.png)
+![precision](assets/bert-loss/precision.png)
 
-### Space-model
+[//]: # (### DistilBERT)
 
-![loss](assets/distilbert/regularization/space-model/loss.png)
-![accuracy](assets/distilbert/regularization/space-model/accuracy.png)
-![f1_macro](assets/distilbert/regularization/space-model/f1.png)
-![recall](assets/distilbert/regularization/space-model/recall.png)
-![precision](assets/distilbert/regularization/space-model/precision.png)
+[//]: # ()
+[//]: # (![loss]&#40;assets/distilbert/regularization/distilbert/loss.png&#41;)
+
+[//]: # (![accuracy]&#40;assets/distilbert/regularization/distilbert/accuracy.png&#41;)
+
+[//]: # (![f1_macro]&#40;assets/distilbert/regularization/distilbert/f1.png&#41;)
+
+[//]: # (![recall]&#40;assets/distilbert/regularization/distilbert/recall.png&#41;)
+
+[//]: # (![precision]&#40;assets/distilbert/regularization/distilbert/precision.png&#41;)
+
+[//]: # ()
+[//]: # (### Space-model)
+
+[//]: # ()
+[//]: # (![loss]&#40;assets/distilbert/regularization/space-model/loss.png&#41;)
+
+[//]: # (![accuracy]&#40;assets/distilbert/regularization/space-model/accuracy.png&#41;)
+
+[//]: # (![f1_macro]&#40;assets/distilbert/regularization/space-model/f1.png&#41;)
+
+[//]: # (![recall]&#40;assets/distilbert/regularization/space-model/recall.png&#41;)
+
+[//]: # (![precision]&#40;assets/distilbert/regularization/space-model/precision.png&#41;)
+
+## Explaining the Space-model
+
+### Concept Spaces (Inter-space and Intra-space) Attribution Visualization
+
+TODO (add images)... -->
