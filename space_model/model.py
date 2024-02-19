@@ -115,3 +115,65 @@ class SpaceModelForSequenceClassification(torch.nn.Module):
                 out.concept_spaces)
 
         return SpaceModelForSequenceClassificationOutput(loss, logits, out.concept_spaces)
+
+
+class SpaceModelForMultiLabelOutput:
+    def __init__(self, loss, logits, concept_spaces):
+        self.loss = loss
+        self.logits = logits
+        self.concept_spaces = concept_spaces
+
+
+class SpaceModelForMultiLabelClassification(torch.nn.Module):
+    def __init__(self, base_model, n_embed, n_latent, n_concept_spaces, l1, l2, ce_w, fine_tune=False):
+        super(SpaceModelForMultiLabelClassification, self).__init__()
+        self.device = base_model.device
+        self.n_concept_spaces = n_concept_spaces
+
+        self.base_model = base_model
+
+        if fine_tune:
+            for p in base_model.parameters():
+                p.requires_grad_(False)
+
+        self.space_model = SpaceModel(n_embed, n_latent, n_concept_spaces, output_concept_spaces=True)
+
+        self.classifier = torch.nn.Linear(n_concept_spaces * n_latent, n_concept_spaces)
+
+        self.l1 = l1
+        self.l2 = l2
+        self.ce_w = ce_w
+
+    def to(self, device):
+        self.device = device
+        super().to(device)
+        return self
+
+    def get_concept_spaces(self, input_ids, attention_mask):
+        embed = self.base_model(input_ids, attention_mask).last_hidden_state  # (B, max_seq_len, 768)
+
+        out = self.space_model(embed)
+
+        return out.concept_spaces
+
+    def forward(self, input_ids, attention_mask, labels=None):
+        embed = self.base_model(input_ids, attention_mask).last_hidden_state  # (B, max_seq_len, 768)
+
+        # SpaceModelOutput(logits=(B, n_concept_spaces * n_latent), concept_spaces=(n_concept_spaces, B, max_seq_len, n_latent))
+        projected = self.space_model(embed)
+
+        concept_hidden = projected.logits
+
+        logits = self.classifier(concept_hidden)
+
+        loss = None
+        if labels is not None:
+            loss = self.ce_w * F.binary_cross_entropy_with_logits(
+                logits.view(-1, self.n_concept_spaces),
+                labels.view(-1, self.n_concept_spaces).float()
+            )
+
+            loss += self.l1 * losses.inter_space_loss(projected.concept_spaces, labels) + \
+                    self.l2 * losses.intra_space_loss(projected.concept_spaces)
+
+        return SpaceModelForMultiLabelOutput(loss, logits, projected.concept_spaces)
