@@ -5,12 +5,13 @@ import space_model.loss as losses
 
 
 class SpaceModelOutput:
-    def __init__(self, logits=None, concept_spaces=None):
+    def __init__(self, logits=None, concept_spaces=None, raw_concept_spaces=None):
         self.logits = logits
         self.concept_spaces = concept_spaces
+        self.raw_concept_spaces = raw_concept_spaces
 
     def __repr__(self):
-        return f'{self.logits=},{self.concept_spaces=}'
+        return f'{self.logits=},{self.concept_spaces=},{self.raw_concept_spaces=}'
 
 
 class SpaceModel(torch.nn.Module):
@@ -21,15 +22,13 @@ class SpaceModel(torch.nn.Module):
 
         # project embedding space (B, max_seq_len, n_embed) -> to the concept space (B, n_embed, n_latent) = (B, max_seq_len, n_latent)
         self.concept_spaces = torch.nn.ModuleList([
-            torch.nn.Sequential(
-                # unlike in the original paper, here we use a combination of Dense layer + tanh instead of cosine similarity
-                torch.nn.Linear(in_features=n_embed, out_features=n_latent, bias=False),
-                torch.nn.Tanh(),
-            ) for _ in range(n_concept_spaces)
+            # unlike in the original paper, here we use a combination of Dense layer + tanh instead of cosine similarity
+            torch.nn.Linear(in_features=n_embed, out_features=n_latent, bias=False) for _ in range(n_concept_spaces)
         ])
 
     def forward(self, x):
-        projected_x = [space(x) for space in self.concept_spaces]  # (n_concept_spaces, B, max_seq_len, n_latent)
+        raw_projected_x = [space(x) for space in self.concept_spaces]  # (n_concept_spaces, B, max_seq_len, n_latent)
+        projected_x = [F.tanh(x) for x in raw_projected_x]  # (n_concept_spaces, B, max_seq_len, n_latent)
 
         avg_concept_attention = [x.mean(1) for x in projected_x]  # (n_concept_spaces, B, n_latent)
 
@@ -39,7 +38,7 @@ class SpaceModel(torch.nn.Module):
         if self.output_concept_spaces:
             concept_spaces = projected_x
 
-        return SpaceModelOutput(concept_logits, concept_spaces)
+        return SpaceModelOutput(concept_logits, concept_spaces, raw_projected_x)
 
 
 class SpaceModelForClassification(torch.nn.Module):
@@ -57,18 +56,20 @@ class SpaceModelForClassification(torch.nn.Module):
 
         logits = self.concept_classifier(outputs.logits)  # (B, n_concept_spaces)
 
-        return SpaceModelOutput(logits, outputs.concept_spaces)
+        return SpaceModelOutput(logits, outputs.concept_spaces, outputs.raw_concept_spaces)
 
 
 class SpaceModelForSequenceClassificationOutput:
-    def __init__(self, loss=None, logits=None, concept_spaces=None):
+    def __init__(self, loss=None, logits=None, concept_spaces=None, raw_concept_spaces=None):
         self.loss = loss
         self.logits = logits
         self.concept_spaces = concept_spaces
+        self.raw_concept_spaces = raw_concept_spaces
 
 
 class SpaceModelForSequenceClassification(torch.nn.Module):
-    def __init__(self, base_model, n_embed=3, n_latent=3, n_concept_spaces=2, l1=1e-3, l2=1e-4, ce_w=1.0, fine_tune=True):
+    def __init__(self, base_model, n_embed=3, n_latent=3, n_concept_spaces=2, l1=1e-3, l2=1e-4, ce_w=1.0,
+                 fine_tune=True):
         super().__init__()
 
         if fine_tune:
@@ -99,10 +100,17 @@ class SpaceModelForSequenceClassification(torch.nn.Module):
 
         return out.concept_spaces
 
+    def get_token_attention(self, input_ids, attention_mask):
+        embed = self.base_model(input_ids, attention_mask).last_hidden_state
+
+        out = self.space_model(embed)
+
+        return [x.mean(2) for x in out.raw_concept_spaces]  # (n_concept_spaces, B, max_seq_len)
+
     def forward(self, input_ids, attention_mask, labels=None):
         embed = self.base_model(input_ids, attention_mask).last_hidden_state  # (B, max_seq_len, 768)
 
-        out = self.space_model(embed) # SpaceModelOutput(logits=(B, n_concept_spaces * n_latent), ...)
+        out = self.space_model(embed)  # SpaceModelOutput(logits=(B, n_concept_spaces * n_latent), ...)
 
         concept_hidden = out.logits
 
@@ -114,14 +122,15 @@ class SpaceModelForSequenceClassification(torch.nn.Module):
             loss += self.l1 * losses.inter_space_loss(out.concept_spaces, labels) + self.l2 * losses.intra_space_loss(
                 out.concept_spaces)
 
-        return SpaceModelForSequenceClassificationOutput(loss, logits, out.concept_spaces)
+        return SpaceModelForSequenceClassificationOutput(loss, logits, out.concept_spaces, out.raw_concept_spaces)
 
 
 class SpaceModelForMultiLabelOutput:
-    def __init__(self, loss, logits, concept_spaces):
+    def __init__(self, loss, logits, concept_spaces, raw_concept_spaces=None):
         self.loss = loss
         self.logits = logits
         self.concept_spaces = concept_spaces
+        self.raw_concept_spaces = raw_concept_spaces
 
 
 class SpaceModelForMultiLabelClassification(torch.nn.Module):
@@ -176,4 +185,4 @@ class SpaceModelForMultiLabelClassification(torch.nn.Module):
             loss += self.l1 * losses.inter_space_loss(projected.concept_spaces, labels) + \
                     self.l2 * losses.intra_space_loss(projected.concept_spaces)
 
-        return SpaceModelForMultiLabelOutput(loss, logits, projected.concept_spaces)
+        return SpaceModelForMultiLabelOutput(loss, logits, projected.concept_spaces, projected.raw_concept_spaces)
