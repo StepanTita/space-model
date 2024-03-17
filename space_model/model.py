@@ -94,21 +94,33 @@ class SpaceModelForSequenceClassification(torch.nn.Module):
         return self
 
     def get_concept_spaces(self, input_ids, attention_mask, position_ids=None):
-        embed = self.base_model(input_ids, attention_mask, position_ids).last_hidden_state  # (B, max_seq_len, 768)
+        embed = self.base_model(
+            input_ids=input_ids,
+            attention_mask=attention_mask,
+            position_ids=position_ids
+        ).last_hidden_state  # (B, max_seq_len, 768)
 
         out = self.space_model(embed)
 
         return out.concept_spaces
 
     def get_token_attention(self, input_ids, attention_mask, position_ids=None):
-        embed = self.base_model(input_ids, attention_mask, position_ids).last_hidden_state
+        embed = self.base_model(
+            input_ids=input_ids,
+            attention_mask=attention_mask,
+            position_ids=position_ids
+        ).last_hidden_state
 
         out = self.space_model(embed)
 
         return [x.mean(2) for x in out.raw_concept_spaces]  # (n_concept_spaces, B, max_seq_len)
 
     def forward(self, input_ids, attention_mask, position_ids=None, labels=None):
-        embed = self.base_model(input_ids, attention_mask, position_ids).last_hidden_state  # (B, max_seq_len, 768)
+        embed = self.base_model(
+            input_ids=input_ids,
+            attention_mask=attention_mask,
+            position_ids=position_ids
+        ).last_hidden_state  # (B, max_seq_len, 768)
 
         out = self.space_model(embed)  # SpaceModelOutput(logits=(B, n_concept_spaces * n_latent), ...)
 
