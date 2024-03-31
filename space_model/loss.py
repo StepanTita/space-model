@@ -1,9 +1,7 @@
-import torch
-
-import torch.nn.functional as F
-
 from typing import List
 
+import torch
+import torch.nn.functional as F
 
 def inter_space_loss(concept_spaces: List[torch.Tensor], labels: torch.Tensor, m1: float = 0.5, m2: float = 0.5):
     """
@@ -14,19 +12,17 @@ def inter_space_loss(concept_spaces: List[torch.Tensor], labels: torch.Tensor, m
     :return: loss (scalar)
     """
 
-    concept_spaces = torch.stack(concept_spaces, dim=0)  # (n_concept_spaces, B, seq_len, n_latent)
+    concept_spaces = torch.stack(concept_spaces).permute(1, 0, 2, 3)  # (B, n_concept_spaces, seq_len, n_latent)
 
     if len(labels.shape) == 1:
-        # match loss
-        match_loss = (1 - concept_spaces[labels == torch.arange(len(concept_spaces))]).mean()
-        # mismatch loss
-        mismatch_loss = (1 + concept_spaces[labels != torch.arange(len(concept_spaces))]).mean()
-    else:
-        if len(labels.shape) > 2:
-            raise ValueError("labels must be a tensor or an integer: of shape (B) or of shape (B, labels_dim) (for multi-label classification)")
+        labels = F.one_hot(labels, num_classes=concept_spaces.size(1)).long()
 
-        match_loss = (1 - concept_spaces[labels.T > 0]).mean()
-        mismatch_loss = (1 + concept_spaces[labels.T == 0]).mean()
+    if len(labels.shape) > 2:
+        raise ValueError(
+            "labels must be a tensor or an integer: of shape (B) or of shape (B, labels_dim) (for multi-label classification)")
+
+    match_loss = (1 - concept_spaces[labels > 0]).mean()
+    mismatch_loss = (1 + concept_spaces[labels == 0]).mean()
 
     loss = m1 * match_loss + m2 * mismatch_loss
 
