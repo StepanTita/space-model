@@ -103,16 +103,6 @@ class SpaceModelForSequenceClassification(torch.nn.Module):
 
         return out.concept_spaces
 
-    def get_token_attention(self, input_ids, attention_mask):
-        embed = self.base_model(
-            input_ids=input_ids,
-            attention_mask=attention_mask,
-        ).last_hidden_state
-
-        out = self.space_model(embed)
-
-        return [x.mean(2) for x in out.raw_concept_spaces]  # (n_concept_spaces, B, max_seq_len)
-
     def forward(self, input_ids, attention_mask, labels=None):
         embed = self.base_model(
             input_ids=input_ids,
