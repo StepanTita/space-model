@@ -14,7 +14,7 @@ class SpaceModelOutput:
         return f'{self.logits=},{self.concept_spaces=},{self.raw_concept_spaces=}'
 
 
-class SpaceModel(torch.nn.Module):
+class SpaceLayer(torch.nn.Module):
     def __init__(self, n_embed=3, n_latent=3, n_concept_spaces=2, output_concept_spaces=True):
         super().__init__()
 
@@ -45,7 +45,7 @@ class SpaceModelForClassification(torch.nn.Module):
     def __init__(self, n_embed=3, n_latent=3, n_concept_spaces=2):
         super().__init__()
 
-        self.space_model = SpaceModel(n_embed, n_latent, n_concept_spaces, output_concept_spaces=True)
+        self.space_model = SpaceLayer(n_embed, n_latent, n_concept_spaces, output_concept_spaces=True)
 
         # number of target classes is equal to the number of concepts
         self.concept_classifier = torch.nn.Linear(in_features=n_concept_spaces * n_latent,
@@ -80,7 +80,7 @@ class SpaceModelForSequenceClassification(torch.nn.Module):
 
         self.base_model = base_model
 
-        self.space_model = SpaceModel(n_embed, n_latent, n_concept_spaces, output_concept_spaces=True)
+        self.space_model = SpaceLayer(n_embed, n_latent, n_concept_spaces, output_concept_spaces=True)
 
         self.classifier = torch.nn.Linear(n_concept_spaces * n_latent, n_concept_spaces)
 
@@ -144,7 +144,7 @@ class SpaceModelForMultiLabelClassification(torch.nn.Module):
             for p in base_model.parameters():
                 p.requires_grad_(False)
 
-        self.space_model = SpaceModel(n_embed, n_latent, n_concept_spaces, output_concept_spaces=True)
+        self.space_model = SpaceLayer(n_embed, n_latent, n_concept_spaces, output_concept_spaces=True)
 
         self.classifier = torch.nn.Linear(n_concept_spaces * n_latent, n_concept_spaces)
 
