@@ -55,9 +55,7 @@ class SpaceLayer(torch.nn.Module):
         raw_projected_x = [space(x) for space in self.concept_spaces]  # (n_concept_spaces, B, max_seq_len, n_latent)
         projected_x = [F.tanh(x) for x in raw_projected_x]  # (n_concept_spaces, B, max_seq_len, n_latent)
 
-        avg_concept_attention = [x.mean(1) for x in projected_x]  # (n_concept_spaces, B, n_latent)
-
-        concept_logits = torch.cat(avg_concept_attention, dim=-1)  # (B, n_concept_spaces * n_latent)
+        concept_logits = torch.cat(projected_x, dim=-1)  # (B, max_seq_len, n_concept_spaces * n_latent)
 
         return concept_logits
 
