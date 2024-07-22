@@ -53,6 +53,8 @@ class SpaceLayer(torch.nn.Module):
 
         self.layer_norm = torch.nn.LayerNorm(n_concept_spaces * n_latent, elementwise_affine=True)
 
+        self._raw_transformed_cs = None
+
     def forward(self, x):
         raw_projected_x = [space(x) for space in self.concept_spaces]  # (n_concept_spaces, B, max_seq_len, n_latent)
         projected_x = [F.tanh(x) for x in raw_projected_x]  # (n_concept_spaces, B, max_seq_len, n_latent)
@@ -60,6 +62,8 @@ class SpaceLayer(torch.nn.Module):
         concept_logits = torch.cat(projected_x, dim=-1)  # (B, max_seq_len, n_concept_spaces * n_latent)
 
         concept_logits = self.layer_norm(concept_logits)
+
+        self._raw_transformed_cs = projected_x
 
         return concept_logits
 
